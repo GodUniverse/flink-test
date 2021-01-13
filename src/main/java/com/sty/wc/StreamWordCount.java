@@ -2,6 +2,7 @@ package com.sty.wc;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -12,7 +13,11 @@ public class StreamWordCount {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 //        String inputPath = "/Users/sty/IdeaProjects/flink-test/src/main/resources/word.txt";
 //        DataStream<String> streamSource = env.readTextFile(inputPath);
-        DataStream<String> streamSource = env.socketTextStream("localhost", 7777);
+        ParameterTool parameterTool = ParameterTool.fromArgs(args);
+        String host = parameterTool.get("host");
+        int port = parameterTool.getInt("port");
+
+        DataStream<String> streamSource = env.socketTextStream(host, port);
         streamSource.flatMap(new MyflatMapper())
                 .keyBy(0)
                 .sum(1)
